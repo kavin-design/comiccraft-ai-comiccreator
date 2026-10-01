@@ -1,0 +1,16 @@
+.env
+comiccraft-env/
+node_modules/
+dist/
+.vite/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Ignore contents of panels and exports but preserve .gitkeep
+static/panels/*
+!static/panels/.gitkeep
+static/exports/*
+!static/exports/.gitkeep

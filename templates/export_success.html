@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comic Exported Successfully — ComicCraft</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success-color: #16a34a;
+      --success-hover: #15803d;
+      --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #312e81 100%);
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+      background:
+        radial-gradient(ellipse at top, rgba(34, 197, 94, 0.2), transparent 70%),
+        radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.2), transparent 70%),
+        var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+    }
+
+    .success-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px;
+      padding: 36px 30px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .icon-wrapper {
+      width: 68px;
+      height: 68px;
+      background: #dcfce7;
+      border: 3px solid #bbf7d0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      font-size: 32px;
+      color: #16a34a;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .file-box {
+      background: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .file-info {
+      overflow: hidden;
+    }
+
+    .file-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .file-name {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-download-again {
+      background: #e2e8f0;
+      color: #0f172a;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-download-again:hover {
+      background: #cbd5e1;
+    }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      background-color: var(--primary-color);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="success-card">
+    <div class="icon-wrapper">
+      ✓
+    </div>
+
+    <h1 class="title">Comic Created & Exported!</h1>
+    <p class="subtitle">
+      Your 5-panel comic has been compiled and downloaded as a multi-page PDF document.
+    </p>
+
+    <!-- PDF File Info Box -->
+    <div class="file-box">
+      <div class="file-info">
+        <div class="file-label">Generated PDF File</div>
+        <div class="file-name">{{ filename }}</div>
+      </div>
+
+      {% if pdf_path %}
+      <a href="/download?pdf_path={{ pdf_path }}" class="btn-download-again">
+        📥 Download again
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Go Create Another Comic Action -->
+    <a href="/" class="btn-primary">
+      ✨ Go Create Another Comic
+    </a>
+  </div>
+
+</body>
+</html>

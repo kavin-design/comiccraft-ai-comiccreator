@@ -1,0 +1,7 @@
+{
+  "name": "ComicCraft – AI Comic Story Creator",
+  "description": "Generate 5-panel comic strips complete with storyline, dialogue, and vibrant illustrations using Gemini AI, with instant PDF download.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

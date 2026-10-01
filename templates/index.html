@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComicCraft — AI Comic Story Creator</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #312e81 100%);
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      --accent-yellow: #facc15;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+      /* Scenic atmospheric gradient with layered backdrop */
+      background:
+        radial-gradient(ellipse at top, rgba(56, 189, 248, 0.25), transparent 70%),
+        radial-gradient(ellipse at bottom, rgba(168, 85, 247, 0.2), transparent 70%),
+        var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+    }
+
+    .main-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
+      position: relative;
+      z-index: 10;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #fef08a;
+      color: #854d0e;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .error-banner {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #ef4444;
+      color: #991b1b;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    /* API Key Tooltip */
+    .tooltip-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .tooltip-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #3b82f6;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      line-height: 1;
+    }
+
+    .tooltip-icon:hover {
+      background: #1d4ed8;
+      transform: scale(1.1);
+    }
+
+    .tooltip-bubble {
+      visibility: hidden;
+      opacity: 0;
+      width: 220px;
+      background-color: #0f172a;
+      color: #f8fafc;
+      text-align: left;
+      border-radius: 8px;
+      padding: 8px 10px;
+      position: absolute;
+      z-index: 30;
+      bottom: 130%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: opacity 0.2s, visibility 0.2s;
+      pointer-events: none;
+    }
+
+    .tooltip-bubble::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #0f172a transparent transparent transparent;
+    }
+
+    .tooltip-container:hover .tooltip-bubble,
+    .tooltip-icon:focus + .tooltip-bubble {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 11px 13px;
+      font-size: 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      background-color: #f8fafc;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      background-color: #ffffff;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 85px;
+      line-height: 1.4;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--primary-color);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      transition: all 0.2s ease;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-submit:active {
+      transform: translateY(1px);
+    }
+
+    .card-footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+
+    /* Fullscreen Loading Overlay */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 56px;
+      height: 56px;
+      border: 5px solid rgba(255, 255, 255, 0.15);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 24px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #f8fafc;
+    }
+
+    .loading-steps {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      max-width: 440px;
+      line-height: 1.5;
+    }
+
+    .step-pill {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Submission Card -->
+  <div class="main-card">
+    <div class="card-header">
+      <div class="badge">Naan Mudhalvan Project</div>
+      <h1 class="card-title">✏️ Create Your Comic</h1>
+      <p class="card-subtitle">Generate a 5-panel comic strip with Gemini AI and illustrations</p>
+    </div>
+
+    <!-- Error Banner Area -->
+    {% if error %}
+    <div class="error-banner">
+      <strong>⚠️ Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Comic Creation Form -->
+    <form id="comicForm" action="/generate" method="POST">
+      <!-- Story Prompt -->
+      <div class="form-group">
+        <label for="prompt">Story Prompt *</label>
+        <textarea
+          id="prompt"
+          name="prompt"
+          class="form-control"
+          rows="3"
+          placeholder="e.g. A brave fox exploring an enchanted forest discovers a magical glowing tree"
+          required
+        >{{ default_prompt }}</textarea>
+      </div>
+
+      <!-- Main Character Name -->
+      <div class="form-group">
+        <label for="character_name">Main Character Name *</label>
+        <input
+          type="text"
+          id="character_name"
+          name="character_name"
+          class="form-control"
+          placeholder="e.g. Rusty the Fox"
+          value="{{ default_character }}"
+          required
+        />
+      </div>
+
+      <!-- Setting & Story Tone -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="setting">Setting *</label>
+          <select id="setting" name="setting" class="form-control" required>
+            {% for s in settings %}
+            <option value="{{ s }}" {% if s == default_setting %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="tone">Story Tone *</label>
+          <select id="tone" name="tone" class="form-control" required>
+            {% for t in tones %}
+            <option value="{{ t }}" {% if t == default_tone %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Art Style -->
+      <div class="form-group">
+        <label for="style">Art Style *</label>
+        <select id="style" name="style" class="form-control" required>
+          {% for st in styles %}
+          <option value="{{ st }}" {% if st == default_style %}selected{% endif %}>{{ st }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Mandatory Google Gemini API Key -->
+      <div class="form-group" style="background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 12px; padding: 12px 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: inline-flex; align-items: center; gap: 6px;">
+            <label for="gemini_api_key" style="font-size: 13px; font-weight: 700; color: #1e40af; margin-bottom: 0;">
+              🔑 Google Gemini API Key *
+            </label>
+            <div class="tooltip-container">
+              <a
+                href="https://aistudio.google.com/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tooltip-icon"
+                title="Get your free Gemini API key in Google AI Studio"
+                aria-label="Get Gemini API Key in Google AI Studio"
+              >?</a>
+              <div class="tooltip-bubble">
+                Don't have a key? Click to generate a free Gemini API key on Google AI Studio.
+              </div>
+            </div>
+          </div>
+          <a
+            href="https://aistudio.google.com/apikey"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="font-size: 11px; font-weight: 700; color: #2563eb; text-decoration: underline; display: inline-flex; align-items: center; gap: 3px;"
+          >
+            <span>Get Key ↗</span>
+          </a>
+        </div>
+        <input
+          type="password"
+          id="gemini_api_key"
+          name="gemini_api_key"
+          class="form-control"
+          placeholder="AIzaSy... (Enter your Google Gemini API key)"
+          value="{{ saved_gemini_api_key or '' }}"
+          required
+          autocomplete="off"
+        />
+        <p style="font-size: 11px; color: #64748b; margin-top: 5px; line-height: 1.3;">
+          This single API key generates the storyline, panel dialogue, and artwork. Need a key?
+          <a
+            href="https://aistudio.google.com/apikey"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="color: #2563eb; font-weight: 700; text-decoration: underline; margin-left: 2px;"
+          >
+            Generate one free at Google AI Studio ↗
+          </a>
+        </p>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" id="generateBtn" class="btn-submit">
+        <span>🚀 Generate Comic</span>
+      </button>
+    </form>
+
+    <div class="card-footer-note">
+      Powered by Google Gemini Models • Instant PDF Export
+    </div>
+  </div>
+
+  <!-- Fullscreen Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-title">Generating your comic…</div>
+    <div class="loading-steps">
+      <span class="step-pill">1. Outline</span> →
+      <span class="step-pill">2. Story</span> →
+      <span class="step-pill">3. Illustrations</span> →
+      <span class="step-pill">4. PDF</span>
+    </div>
+    <p style="margin-top: 14px; font-size: 12px; color: #94a3b8;">
+      Crafting 5 custom panels (this can take 1–3 minutes)
+    </p>
+  </div>
+
+  <script>
+    const form = document.getElementById('comicForm');
+    const submitBtn = document.getElementById('generateBtn');
+    const overlay = document.getElementById('loadingOverlay');
+
+    form.addEventListener('submit', function (e) {
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.7';
+      submitBtn.innerHTML = '<span>⏳ Preparing Generation...</span>';
+      overlay.classList.add('active');
+    });
+  </script>
+</body>
+</html>
