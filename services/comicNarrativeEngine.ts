@@ -5,8 +5,16 @@
  * receive a complete, engaging 5-panel comic strip.
  */
 
+// Story panel template with proper typing for type-safe dynamic key access
+interface StoryPanelTemplate {
+  panelNumber: number;
+  title: string;
+  caption: string;
+  narration: string;
+}
+
 // Story templates for different tones, settings, and art styles
-const STORY_TEMPLATES = {
+const STORY_TEMPLATES: Record<string, { panels: StoryPanelTemplate[] }> = {
   // Light-hearted templates
   'Light-hearted:Forest:Comic Book': {
     panels: [
